@@ -1,11 +1,30 @@
 import React from 'react';
-import { Col, Row, theme, Form, Input, Button } from 'antd';
+import { Col, Row, theme, Form, Input, Button, message } from 'antd';
 import LogoLogin from 'access/images/7522174.png';
 import Logo from 'access/images/Logo.png';
 import { PageWrapper } from 'pages/Login/Login.styled';
 import { useNavigate } from "react-router-dom";
+import LoginDto from './models/LoginDto';
+import axios from '../../common/baseAxios';
+import { Cookies } from "react-cookie";
+let cookie = new Cookies();
 const Login = () => {
     const navigate = useNavigate();
+    const onFinish = (input: LoginDto) => {
+        axios.post(`Accounts/Login`, input).then((result) => {
+            if(result?.data?.status) {
+                let expires = new Date();
+                expires.setTime(expires.getTime() + 604800);
+                cookie.set('token', result.data.data.token, { path: "/", expires: expires });
+                axios.defaults.headers.common = { Authorization: `Bearer ${result.data.data.token}` };
+                navigate("/");
+                message.success('Đăng nhập thành công.')
+            }
+            else {
+                message.error('Đăng nhập thất bại.')
+            }
+        })
+    }
     return <PageWrapper>
         <Row gutter={[0, 0]} className={'row-1'}>
             <Col span={12} className={'box-left'}>
@@ -20,6 +39,7 @@ const Login = () => {
                         name="basic"
                         layout={'vertical'}
                         style={{ maxWidth: 600 }}
+                        onFinish={onFinish}
                         autoComplete="off"
                     >
                         <Form.Item

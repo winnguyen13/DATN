@@ -1,42 +1,82 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Row, Input, Space, Table, Tag } from "antd";
-import { SearchOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { SearchOutlined, InfoCircleOutlined, DownloadOutlined  } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import DocumentDto from 'pages/Document/models/DocumentDto';
+import AddModal from "./Add";
+import axios from '../../common/baseAxios';
+import moment from 'moment'
 const Document = () => {
+    const [open, setOpen] = useState(false);
+    const [data, setData] = useState(new Array<DocumentDto>);
     const columns: ColumnsType<DocumentDto> = [
         {
             title: 'Tên Tài Liệu',
-            dataIndex: 'Name',
-            key: 'Name',
+            dataIndex: 'name',
+            key: 'name',
         },
         {
             title: 'Kích Cỡ',
-            dataIndex: 'DocumentSize',
-            key: 'DocumentSize'
+            dataIndex: 'documentSize',
+            key: 'documentSize',
+            render: (documentSize) => (
+                <Space size="middle">{`${(documentSize / (1024 ** 2)).toFixed(2)}MB`}</Space>
+            )
         },
         {
             title: 'Ngày Tải Lên',
-            dataIndex: 'CreatedAt',
-            key: 'CreatedAt'
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (createdAt: Date) => (
+                <Space size="middle">{moment(createdAt).format("DD/MM/YYYY hh:mm")}</Space>
+            )
         },
         {
             title: ``,
             key: `action`,
-            render: (_, record) => (
+            render: (record) => (
                 <Space size="middle">
-                    <Button size="middle"><InfoCircleOutlined /></Button>
+                    <Button size="middle" onClick={() => handleDownload(record.id)}><DownloadOutlined /></Button>
                 </Space>
             )
         }
     ]
-    let data: DocumentDto[] = [
-        {
-            Name: 'David',
-            DocumentSize: 10,
-            CreatedAt: new Date()
+    useEffect(() => {
+        getListDocuments();
+    }, []);
+    const closeForm = (isSave = false) => {
+        setOpen(false);
+        if (isSave) {
+            getListDocuments();
         }
-    ];
+    }
+    const getListDocuments = () => {
+        axios.get(`Documents`).then((res) => {
+            if (res?.data?.status) {
+                setData(res.data.data);
+            }
+        })
+    }
+    const handleDownload = (id: any) => {
+        axios({
+            url: `Documents/Download/${id}`,
+            method: 'GET',
+            responseType: 'blob',
+        }).then((response) => {
+            axios.get(`Documents/${id}`).then((result) => {
+                if(result.data.data) {
+                    const href = URL.createObjectURL(response.data);
+                    const link = document.createElement('a');
+                    link.href = href;
+                    link.setAttribute('download', result.data.data.displayName);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(href);
+                }
+            })
+        });
+    }
     return <>
         <div>
             <Row>
@@ -44,18 +84,19 @@ const Document = () => {
             </Row>
             <Row style={{ marginTop: '20px' }}>
                 <Col span={12}>
-                    <Input placeholder="Tìm kiếm theo tên hoặc email" prefix={<SearchOutlined />} />
+                    <Input placeholder="Tìm kiếm theo tên" prefix={<SearchOutlined />} />
                 </Col>
                 <Col span={12} style={{ textAlign: 'right' }}>
-                    <Button>Thêm Mới</Button>
+                    <Button onClick={() => setOpen(true)}>Thêm Mới</Button>
                 </Col>
             </Row>
             <Row style={{ marginTop: '20px' }}>
                 <Col span={24}>
-                    <Table columns={columns} dataSource={data} ></Table>
+                    <Table columns={columns} dataSource={data} rowKey="id" ></Table>
                 </Col>
             </Row>
         </div>
+        {open && <AddModal open={open} closeForm={closeForm} />}
     </>
 }
 export default Document;

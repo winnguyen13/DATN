@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Row, Input, Space, Table, Tag } from "antd";
 import { SearchOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import StudentDto from 'pages/Student/models/StudentDto';
 import AddModal from "./Add";
 import ViewModal from "./View";
+import axios from '../../common/baseAxios';
 const Student = () => {
     const [open, setOpen] = useState(false);
     const [openView, setOpenView] = useState(false);
+    const [curentId, setCurentId] = useState<any>(Number);
+    const [data, setData] = useState(new Array<StudentDto>);
     const columns: ColumnsType<StudentDto> = [
         {
             title: 'Họ & Tên',
@@ -31,8 +34,13 @@ const Student = () => {
         },
         {
             title: 'Giới Tính',
-            dataIndex: 'genderName',
-            key: 'genderName'
+            key: 'genderId',
+            dataIndex: 'genderId',
+            render: (genderId) => (
+                <Space size="middle">
+                    {genderId === 1 ? 'Nam' : (genderId === 2 ? 'Nữ' : 'Khác')}
+                </Space>
+            )
         },
         {
             title: 'Số Điện Thoại',
@@ -42,26 +50,36 @@ const Student = () => {
         {
             title: ``,
             key: `action`,
-            render: (_, record) => (
+            render: (record) => (
                 <Space size="middle">
-                    <Button size="middle" onClick={() => setOpenView(true)}><InfoCircleOutlined /></Button>
+                    <Button size="middle" onClick={() => handleFormView(record.id)}><InfoCircleOutlined /></Button>
                 </Space>
             )
         }
     ]
-    let data: StudentDto[] = [
-        {
-            name: 'David',
-            className: '1',
-            classId: 1,
-            courseId: 1,
-            courseName: 'Backend',
-            email: 'david@gmail.com',
-            genderName: 'Nam',
-            phone: '0976xxxx',
-            Id: 1
+    useEffect(() => {
+        getListStudents();
+    }, []);
+    const closeForm = (isSave = false) => {
+        setOpen(false);
+        if (isSave) {
+            getListStudents();
         }
-    ];
+    }
+    const getListStudents = (search: string = '') => {
+        axios.get(`Students?search=${search}`).then((res) => {
+            if (res?.data?.status) {
+                setData(res.data.data);
+            }
+        });
+    }
+    const handleFormView = (id: Number) => {
+        setCurentId(id);
+        setOpenView(true);
+    }
+    const handleOnChange = (event: any) => {
+        getListStudents(event.target.value);
+    }
     return <>
         <div>
             <Row>
@@ -69,7 +87,7 @@ const Student = () => {
             </Row>
             <Row style={{ marginTop: '20px' }}>
                 <Col span={12}>
-                    <Input placeholder="Tìm kiếm theo tên hoặc email" prefix={<SearchOutlined />} />
+                    <Input onChange={handleOnChange} placeholder="Tìm kiếm theo tên hoặc email" prefix={<SearchOutlined />} />
                 </Col>
                 <Col span={12} style={{ textAlign: 'right' }}>
                     <Button onClick={() => setOpen(true)}>Thêm Mới</Button>
@@ -77,12 +95,12 @@ const Student = () => {
             </Row>
             <Row style={{ marginTop: '20px' }}>
                 <Col span={24}>
-                    <Table columns={columns} dataSource={data} rowKey="Id"></Table>
+                    <Table columns={columns} dataSource={data} rowKey="id"></Table>
                 </Col>
             </Row>
         </div>
-        {open && <AddModal open={open} setOpen={setOpen} />}
-        {openView && <ViewModal open={openView} setOpen={setOpenView} />}
+        {open && <AddModal open={open} closeForm={closeForm} />}
+        {openView && <ViewModal open={openView} setOpen={setOpenView} id={curentId} />}
     </>
 }
 export default Student;

@@ -5,8 +5,9 @@ interface StudentDto {
     courseId: number,
     courseName: string,
     email: string,
-    genderName: string,
+    genderId: number,
     phone: string,
-    Id: number,
+    id: number,
+    address: string
 }
 export default StudentDto;

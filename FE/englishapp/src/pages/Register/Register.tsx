@@ -1,11 +1,24 @@
 import React from 'react';
-import { Col, Row, theme, Form, Input, Button } from 'antd';
+import { Col, Row, theme, Form, Input, Button, message } from 'antd';
 import LogoLogin from 'access/images/7522174.png';
 import Logo from 'access/images/Logo.png';
 import { PageWrapper } from 'pages/Login/Login.styled';
 import { useNavigate } from "react-router-dom";
+import RegisterDto from '../Register/models/RegisterDto';
+import axios from '../../common/baseAxios';
 const Register = () => {
     const navigate = useNavigate();
+    const onFinish = (input: RegisterDto) => {
+        axios.post(`Accounts`, input).then((result) => {
+            if(result?.data?.status) {
+                navigate("/login");
+                message.success('Tạo tài khoản thành công.')
+            }
+            else {
+                message.error('Tạo tài khoản thất bại.')
+            }
+        })
+    };
     return <PageWrapper>
         <Row gutter={[0, 0]} className={'row-1'}>
             <Col span={12} className={'box-left'}>
@@ -20,29 +33,44 @@ const Register = () => {
                         name="basic"
                         layout={'vertical'}
                         style={{ maxWidth: 600 }}
+                        onFinish={onFinish}
                         autoComplete="off"
                     >
-                        <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Vui lòng nhập email của bạn!' }]}>
+                        <Form.Item label="Email" name="Email" rules={[
+                            { required: true, message: 'Vui lòng nhập email của bạn!' },
+                            { type: 'email',  message: 'Định dạng E-mail không đúng!'},
+                        ]}>
                             <Input placeholder='Email của bạn' />
                         </Form.Item>
                         <Form.Item
                             label="Tên đăng nhập:"
-                            name="username"
+                            name="UserName"
                             rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập của bạn!' }]}
                         >
                             <Input placeholder='Tên đăng nhập của bạn' />
                         </Form.Item>
                         <Form.Item
                             label="Mật khẩu"
-                            name="password"
+                            name="Password"
                             rules={[{ required: true, message: 'Vui lòng nhập mật khẩu của bạn!' }]}
                         >
                             <Input.Password placeholder='Mật khẩu của bạn' />
                         </Form.Item>
                         <Form.Item
                             label="Xác nhận mật khẩu"
-                            name="confirmPassword"
-                            rules={[{ required: true, message: 'Vui lòng nhập xác nhận mật khẩu của bạn!' }]}
+                            name="ConfirmPassword"
+                            dependencies={['Password']}
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập xác nhận mật khẩu của bạn!' },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                      if (!value || getFieldValue('Password') === value) {
+                                        return Promise.resolve();
+                                      }
+                                      return Promise.reject(new Error('Xác nhận mật khẩu không chính xác !'));
+                                    },
+                                  }),
+                            ]}
                         >
                             <Input.Password placeholder='Xác nhận mật khẩu' />
                         </Form.Item>

@@ -1,12 +1,10 @@
 interface TeacherDto {
-    name: string,
-    className: string,
-    classId: number,
-    courseId: number,
-    courseName: string,
-    email: string,
-    genderName: string,
-    phone: string,
-    Id: number,
+    name: String,
+    email: String,
+    phone: String,
+    genderId: Number,
+    address: String,
+    education: String,
+    id: Number
 }
 export default TeacherDto;

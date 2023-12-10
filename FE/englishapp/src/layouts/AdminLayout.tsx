@@ -2,12 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Outlet } from 'react-router-dom';
 import Logo from 'access/images/Logo.png'
+import Avatar from 'access/images/headeravatar.png';
 import {
-    DesktopOutlined,
-    FileOutlined,
     PieChartOutlined,
-    TeamOutlined,
+    LogoutOutlined,
+    WalletOutlined,
+    FileAddOutlined,
+    ReadOutlined,
     UserOutlined,
+    TeamOutlined,
+    CalendarOutlined,
+    HomeOutlined
 } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 const { Header, Content, Footer, Sider } = Layout;
@@ -24,17 +29,20 @@ const AdminLayout = () => {
                     <img className={'logo'} src={Logo} alt="" />
                 </div>
                 <Menu defaultSelectedKeys={['1']} mode="inline">
-                    <Menu.Item key={1} onClick={() => navigate("/")}><PieChartOutlined /> <span>Trang Chủ</span></Menu.Item>
-                    <Menu.Item key={2} onClick={() => navigate("/course")}><PieChartOutlined /> <span>Khóa Học</span></Menu.Item>
-                    <Menu.Item key={3} onClick={() => navigate("/teacher")}><PieChartOutlined /> <span>Giảng Viên</span></Menu.Item>
-                    <Menu.Item key={4} onClick={() => navigate("/student")}><PieChartOutlined /> <span>Học Viên</span></Menu.Item>
-                    <Menu.Item key={5} onClick={() => navigate("/document")}><PieChartOutlined /> <span>Tài Liệu</span></Menu.Item>
-                    <Menu.Item key={6}><PieChartOutlined /> <span>Doanh Thu</span></Menu.Item>
-                    <Menu.Item key={7}><PieChartOutlined /> <span>Lịch</span></Menu.Item>
+                    <Menu.Item key={1} onClick={() => navigate("/")}><HomeOutlined /> <span>Trang Chủ</span></Menu.Item>
+                    <Menu.Item key={2} onClick={() => navigate("/course")}><ReadOutlined /> <span>Khóa Học</span></Menu.Item>
+                    <Menu.Item key={3} onClick={() => navigate("/teacher")}><UserOutlined /> <span>Giảng Viên</span></Menu.Item>
+                    <Menu.Item key={4} onClick={() => navigate("/student")}><TeamOutlined /> <span>Học Viên</span></Menu.Item>
+                    <Menu.Item key={5} onClick={() => navigate("/document")}><FileAddOutlined /> <span>Tài Liệu</span></Menu.Item>
+                    <Menu.Item key={6} onClick={() => navigate("/revenue")}><WalletOutlined /> <span>Doanh Thu</span></Menu.Item>
+                    <Menu.Item key={7} onClick={() => navigate("/calendar")}><CalendarOutlined /> <span>Lịch</span></Menu.Item>
+                    <Menu.Item key={8} onClick={() => navigate("/login")}><LogoutOutlined /> <span>Đăng Xuất</span></Menu.Item>
                 </Menu>
             </Sider>
             <Layout>
-                <Header style={{ padding: 0, background: colorBgContainer }} />
+                <Header style={{ padding: 0, background: colorBgContainer, textAlign: 'right' }} >
+                    <img src={Avatar} alt='' style={{ paddingRight: `17px`, width: `65px`, cursor: `pointer`}} />
+                </Header>
                 <Content style={{ margin: '16px 16px' }}>
                     <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}><Outlet /></div>
                 </Content>

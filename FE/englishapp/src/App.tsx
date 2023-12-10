@@ -8,7 +8,11 @@ import Student from 'pages/Student/Student';
 import Course from 'pages/Course/Course';
 import Document from 'pages/Document/Document';
 import Home from 'pages/Home/Home';
+import Revenue from 'pages/Revenue/Revenue';
+import CalendarCom from 'pages/Calendar/Calendar';
+import { message } from 'antd';
 const App = () => {
+  const [messageApi, contextHolder] = message.useMessage();
     const router = createBrowserRouter([
         {
           path: "/",
@@ -20,7 +24,7 @@ const App = () => {
               element: <Home />
             },
             {
-              path: "teacher",
+              path: "/teacher",
               element: <Teacher />
             },
             {
@@ -34,6 +38,14 @@ const App = () => {
             {
               path: "/document",
               element: <Document />
+            },
+            {
+              path: "/revenue",
+              element: <Revenue />
+            },
+            {
+              path: "/calendar",
+              element: <CalendarCom />
             }
           ]
         },
@@ -47,6 +59,7 @@ const App = () => {
         }
       ]);
     return <div className="App min-h-screen">
+        {contextHolder}
         <RouterProvider router={router} />
     </div>;
 }

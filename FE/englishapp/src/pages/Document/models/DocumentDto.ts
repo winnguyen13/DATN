@@ -1,8 +1,7 @@
 interface DocumentDto {
-    Name: string,
-    DocumentSize: number,
-    Description?: string,
-    CreatedAt: Date,
-
+    name: string,
+    documentSize: number,
+    description?: string,
+    createdAt: Date,
 }
 export default DocumentDto;

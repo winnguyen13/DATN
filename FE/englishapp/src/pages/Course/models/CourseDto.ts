@@ -1,8 +1,8 @@
 interface CourseDto {
-    courseId: number,
-    courseName: string,
+    id: number,
+    name: string,
     teacherName: string,
     className: string,
-    classSession: string // Buổi học
+    lessonName: string // Buổi học
 }
 export default CourseDto;
